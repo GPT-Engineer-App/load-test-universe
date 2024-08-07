@@ -3,18 +3,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cat, Heart, Info, Paw, Award, Moon, Sun, ChevronDown } from "lucide-react";
+import { Cat, Heart, Info, Paw, Award, Moon, Sun, ChevronDown, Fish } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Progress } from "@/components/ui/progress";
 
 const Index = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [showPaw, setShowPaw] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [catHappiness, setCatHappiness] = useState(50);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,6 +38,7 @@ const Index = () => {
 
   const handleLike = () => {
     setLikeCount(prev => prev + 1);
+    setCatHappiness(prev => Math.min(prev + 10, 100));
     toast({
       title: "Meow!",
       description: "Thanks for liking cats!",
@@ -50,6 +53,41 @@ const Index = () => {
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-b from-gray-900 to-purple-900' : 'bg-gradient-to-b from-purple-200 to-pink-200'}`}>
+      <motion.div
+        className="fixed top-0 left-0 right-0 z-50 p-4 bg-opacity-80 backdrop-blur-sm"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ type: "spring", stiffness: 100 }}
+      >
+        <div className="flex justify-between items-center max-w-7xl mx-auto">
+          <motion.div 
+            className="flex items-center space-x-2"
+            whileHover={{ scale: 1.05 }}
+          >
+            <Cat className="h-8 w-8 text-purple-600" />
+            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+              CatWorld
+            </span>
+          </motion.div>
+          <div className="flex items-center space-x-4">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Switch
+                    checked={isDarkMode}
+                    onCheckedChange={toggleDarkMode}
+                    className="data-[state=checked]:bg-purple-600"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Toggle {isDarkMode ? 'Light' : 'Dark'} Mode</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            {isDarkMode ? <Moon className="h-6 w-6 text-yellow-300" /> : <Sun className="h-6 w-6 text-yellow-500" />}
+          </div>
+        </div>
+      </motion.div>
       {/* Header with Dark Mode Toggle */}
       <header className="absolute top-0 right-0 m-4 z-10">
         <TooltipProvider>
@@ -125,6 +163,21 @@ const Index = () => {
           <ChevronDown size={48} color="white" />
         </motion.div>
       </div>
+
+      {/* Cat Happiness Meter */}
+      <motion.div 
+        className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg z-50"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5 }}
+      >
+        <h3 className="text-lg font-semibold mb-2 flex items-center">
+          <Fish className="mr-2 text-blue-500" />
+          Cat Happiness
+        </h3>
+        <Progress value={catHappiness} className="w-40 h-2" />
+        <p className="text-sm mt-1 text-gray-600">{catHappiness}% Happy</p>
+      </motion.div>
       
       <div className="max-w-7xl mx-auto px-4 py-24">
         <motion.div
@@ -255,7 +308,11 @@ const Index = () => {
       {/* Floating cat paw cursor follower */}
       <motion.div
         className="fixed w-8 h-8 pointer-events-none z-50"
-        animate={{ x: scrollY > 100 ? -100 : 0, opacity: scrollY > 100 ? 0 : 1 }}
+        animate={{ 
+          x: scrollY > 100 ? -100 : 0, 
+          opacity: scrollY > 100 ? 0 : 1,
+          rotate: scrollY
+        }}
         style={{ left: scrollY > 100 ? -100 : 20, top: 20 }}
       >
         <Paw className="text-pink-500" />
