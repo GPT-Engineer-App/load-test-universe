@@ -3,12 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cat, Heart, Info, Paw, Award } from "lucide-react";
+import { Cat, Heart, Info, Paw, Award, Moon, Sun } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Index = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [showPaw, setShowPaw] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -27,8 +31,32 @@ const Index = () => {
     });
   };
 
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+    document.documentElement.classList.toggle('dark');
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-200 to-pink-200">
+    <div className={`min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gradient-to-b from-gray-900 to-purple-900' : 'bg-gradient-to-b from-purple-200 to-pink-200'}`}>
+      {/* Header with Dark Mode Toggle */}
+      <header className="absolute top-0 right-0 m-4 z-10">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Switch
+                checked={isDarkMode}
+                onCheckedChange={toggleDarkMode}
+                className="data-[state=checked]:bg-purple-600"
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Toggle {isDarkMode ? 'Light' : 'Dark'} Mode</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        {isDarkMode ? <Moon className="inline-block ml-2 text-white" /> : <Sun className="inline-block ml-2 text-yellow-500" />}
+      </header>
+
       {/* Hero Section */}
       <div className="relative h-[70vh] bg-cover bg-center" style={{backgroundImage: 'url("https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80")'}}>
         <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
@@ -48,6 +76,13 @@ const Index = () => {
           >
             Discover the fascinating world of our feline friends
           </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 1 }}
+          >
+            <Badge variant="secondary" className="mt-4 text-lg px-4 py-2">Purr-fect Information</Badge>
+          </motion.div>
         </div>
         <AnimatePresence>
           {showPaw && (
@@ -92,7 +127,7 @@ const Index = () => {
                       initial={{ opacity: 0, x: -50 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex items-center bg-purple-100 p-3 rounded-lg shadow-sm"
+                      className={`flex items-center ${isDarkMode ? 'bg-purple-900' : 'bg-purple-100'} p-3 rounded-lg shadow-sm`}
                     >
                       <Paw className="mr-2 h-4 w-4 text-purple-500" />
                       {item}
@@ -123,7 +158,7 @@ const Index = () => {
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.1 }}
-                      className="flex flex-col items-center bg-pink-100 p-4 rounded-lg shadow-sm"
+                      className={`flex flex-col items-center ${isDarkMode ? 'bg-pink-900' : 'bg-pink-100'} p-4 rounded-lg shadow-sm`}
                     >
                       <img src={breed.image} alt={breed.name} className="w-24 h-24 rounded-full object-cover mb-2" />
                       <span className="font-semibold">{breed.name}</span>
@@ -153,7 +188,7 @@ const Index = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.2 }}
-                      className="bg-yellow-100 p-4 rounded-lg shadow-sm"
+                      className={`${isDarkMode ? 'bg-yellow-900' : 'bg-yellow-100'} p-4 rounded-lg shadow-sm`}
                     >
                       {fact}
                     </motion.li>
